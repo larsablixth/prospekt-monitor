@@ -1,0 +1,17 @@
+# systemd/prospekt-monitor.service
+# Kopiera till /etc/systemd/system/
+# Justera User, WorkingDirectory och ExecStart efter din installation.
+
+[Unit]
+Description=Prospekt Monitor — bevakar FI och Nasdaq för nya noteringar
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=YOUR_USERNAME
+WorkingDirectory=/opt/prospekt-monitor
+ExecStart=/opt/prospekt-monitor/venv/bin/python prospekt_monitor.py
+Environment=PROSPEKT_CONFIG=/opt/prospekt-monitor/config.yaml
+StandardOutput=journal
+StandardError=journal

@@ -1,0 +1,15 @@
+# systemd/prospekt-monitor.timer
+# Kopiera till /etc/systemd/system/
+# Kör var 6:e timme.
+
+[Unit]
+Description=Kör Prospekt Monitor var 6:e timme
+Requires=prospekt-monitor.service
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=6h
+Unit=prospekt-monitor.service
+
+[Install]
+WantedBy=timers.target

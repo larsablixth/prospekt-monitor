@@ -1,0 +1,59 @@
+# home_assistant/automation_prospekt.yaml
+#
+# Importera via: HA → Inställningar → Automationer → ⋮ → Importera YAML
+# eller klistra in i configuration.yaml under "automation:"
+#
+# OBS: Byt ut webhook-ID:t mot ditt eget från config.yaml
+
+automation:
+  - alias: "Prospekt Monitor — Ny notering"
+    description: >
+      Tar emot webhook från Prospekt Monitor när ett nytt prospekt analyserats.
+      Skickar persistent notifikation i HA och push till mobilen.
+    trigger:
+      - platform: webhook
+        webhook_id: "prospekt_monitor_abc123"   # ← samma som i config.yaml
+        allowed_methods:
+          - POST
+        local_only: true   # Accepterar bara anrop från lokalt nätverk
+
+    variables:
+      company:  "{{ trigger.json.company }}"
+      score:    "{{ trigger.json.score }}"
+      verdict:  "{{ trigger.json.verdict }}"
+      url:      "{{ trigger.json.url }}"
+      flags:    "{{ trigger.json.red_flags | join(', ') }}"
+      emoji: >
+        {% if verdict == 'Gå vidare' %}✅
+        {% elif verdict == 'Tveksamt' %}⚠️
+        {% else %}❌{% endif %}
+
+    action:
+      # 1. Persistent notifikation i HA-dashboarden
+      - service: persistent_notification.create
+        data:
+          title: "{{ emoji }} Nytt prospekt: {{ company }}"
+          message: >
+            **Poäng:** {{ score }}/100 — {{ verdict }}
+            {% if flags %}
+            **Röda flaggor:** {{ flags }}
+            {% endif %}
+            [Öppna prospekt]({{ url }})
+          notification_id: "prospekt_{{ trigger.json.doc_id }}"
+
+      # 2. Push-notis till mobilen (backup om REST API misslyckas)
+      - service: notify.mobile_app_lars_iphone   # ← ändra till ditt enhetsnamn
+        data:
+          title: "{{ emoji }} Nytt prospekt: {{ company }}"
+          message: "{{ score }}p — {{ verdict }}"
+          data:
+            tag: "prospekt_{{ trigger.json.doc_id }}"
+            group: "prospekt-monitor"
+            url: "{{ url }}"
+
+      # 3. Valfritt: logga till HA logbook
+      - service: logbook.log
+        data:
+          name: "Prospekt Monitor"
+          message: "{{ company }} analyserad: {{ score }}p ({{ verdict }})"
+          entity_id: persistent_notification.prospekt_monitor
