@@ -10,7 +10,7 @@ class GeminiAnalyzer(BaseAnalyzer):
     def __init__(self, config: dict):
         genai.configure(api_key=config["api_key"])
         self.model = genai.GenerativeModel(
-            model_name=config.get("model", "gemini-1.5-pro"),
+            model_name=config.get("model", "gemini-2.5-pro"),
             system_instruction=SYSTEM_PROMPT,
         )
 

@@ -27,11 +27,11 @@ ai_providers:
   openai:
     enabled: true
     api_key: "sk-..."
-    model: "gpt-4o"
+    model: "gpt-4.1"
   gemini:
     enabled: true
     api_key: "AIza..."
-    model: "gemini-1.5-pro"
+    model: "gemini-2.5-pro"
 
 analysis:
   # Minsta konsensuspoäng för att skicka notis (0 = skicka alltid)

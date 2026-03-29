@@ -9,7 +9,7 @@ class OpenAIAnalyzer(BaseAnalyzer):
 
     def __init__(self, config: dict):
         self.client = OpenAI(api_key=config["api_key"])
-        self.model  = config.get("model", "gpt-4o")
+        self.model  = config.get("model", "gpt-4.1")
 
     def _call_api(self, prompt: str) -> str:
         response = self.client.chat.completions.create(
