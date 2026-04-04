@@ -12,11 +12,11 @@ polling:
 email:
   smtp_host: "smtp.gmail.com"
   smtp_port: 587
-  username: "din@gmail.com"
+  username: "your.email@gmail.com"
   password: "xxxx-xxxx-xxxx-xxxx"   # Gmail App Password
-  from_addr: "din@gmail.com"
+  from_addr: "your.email@gmail.com"
   to_addrs:
-    - "din@gmail.com"
+    - "your.email@gmail.com"
 
 # Sätt enabled: false för att stänga av en provider
 ai_providers:
@@ -26,12 +26,12 @@ ai_providers:
     model: "claude-sonnet-4-6"
   openai:
     enabled: true
-    api_key: "sk-..."
-    model: "gpt-4.1"
+    api_key: "sk-proj-..."
+    model: "gpt-4o"
   gemini:
-    enabled: true
+    enabled: false
     api_key: "AIza..."
-    model: "gemini-2.5-pro"
+    model: "gemini-1.5-pro"
 
 analysis:
   # Minsta konsensuspoäng för att skicka notis (0 = skicka alltid)
@@ -44,6 +44,6 @@ home_assistant:
   token: "eyJ..."
   # Enhetsnamn på din mobil: HA → Inställningar → Companion-appen → Enhetsnamn
   # Ersätt mellanslag med underscore och gör lowercase, t.ex. "Lars iPhone" → "lars_iphone"
-  mobile_app: "lars_iphone"
+  mobile_app: "your_iphone"
   # Webhook-ID: skapa en automation i HA med trigger "Webhook" och klistra in ID:t
   webhook_id: "prospekt_monitor_abc123"
