@@ -18,7 +18,7 @@ class ClaudeCliAnalyzer(BaseAnalyzer):
     name = "claude"
 
     def __init__(self, config: dict):
-        self.model   = config.get("model", "sonnet")
+        self.model   = config.get("model", "opus")
         self.timeout = int(config.get("timeout_seconds", 600))
         self.binary  = config.get("binary") or shutil.which("claude")
         if not self.binary:
