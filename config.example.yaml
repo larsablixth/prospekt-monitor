@@ -29,7 +29,7 @@ ai_providers:
   # Aktivera bara EN av claude / claude_cli.
   claude_cli:
     enabled: true
-    model: "sonnet"          # eller "opus"
+    model: "opus"            # senaste Opus; eller "sonnet" för att spara kvot
     timeout_seconds: 600
     # binary: "/home/YOUR_USERNAME/.local/bin/claude"   # om claude inte finns i PATH
   openai:
