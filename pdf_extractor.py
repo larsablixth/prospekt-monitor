@@ -65,12 +65,14 @@ def extract_text_from_pdf(pdf_path: str) -> str:
         return ""
 
 
-def extract_sections(pdf_path: str) -> dict[str, str]:
+def extract_sections(pdf_path: str, full_text: str | None = None) -> dict[str, str]:
     """
     Returnerar dict med nyckelavsnitt → extraherad text.
     Om ett avsnitt inte hittas är värdet en tom sträng.
+    full_text kan skickas in om PDF:en redan är extraherad.
     """
-    full_text = extract_text_from_pdf(pdf_path)
+    if full_text is None:
+        full_text = extract_text_from_pdf(pdf_path)
     if not full_text:
         return {}
 

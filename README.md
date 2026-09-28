@@ -95,6 +95,7 @@ prospekt-monitor/
 │   ├── base.py             # Gemensamt interface + analyseprompt
 │   ├── claude.py           # Anthropic Claude (API-nyckel)
 │   ├── claude_cli.py       # Claude via `claude -p` (Pro/Max-prenumeration)
+│   ├── reader.py           # Snabb läsare (Haiku) som går igenom hela prospektet
 │   ├── openai.py           # OpenAI GPT-4o
 │   └── gemini.py           # Google Gemini
 ├── home_assistant/
@@ -134,3 +135,16 @@ Claude Pro/Max-prenumeration. Ingen API-nyckel behövs.
 
 Om `claude` inte hittas av systemd, ange full sökväg under
 `ai_providers.claude_cli.binary` (se `which claude`).
+
+## Läsare + analys (Haiku läser, Opus analyserar)
+
+Med `reader.enabled: true` läser en snabb modell (standard `haiku`) hela
+prospektet i delar och plockar ut det som är relevant — siffror, ägare,
+lock-up, going concern, kundberoende, IP, marknad — innan analysmodellen
+(standard `opus`) gör bedömningen. Utan läsaren används rubriksökning, som
+bara tar texten efter första rubrikträffen (ofta innehållsförteckningen).
+
+- Läsaren använder samma Claude Code-inloggning som `claude_cli`.
+- Misslyckas läsaren faller programmet automatiskt tillbaka på rubriksökning.
+- Läsarens utdrag går till alla aktiverade analyzers (även OpenAI/Gemini).
+- `max_chunks` sätter ett tak för hur mycket av mycket långa prospekt som läses.

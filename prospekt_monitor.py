@@ -4,7 +4,7 @@ prospekt_monitor.py — Huvudskript.
 Körordning:
   1. Hämta nya dokument från FI + Nasdaq RSS
   2. Ladda hem PDF (om tillgänglig)
-  3. Extrahera nyckelavsnitt
+  3. Extrahera nyckelavsnitt (snabb läsarmodell, annars rubriksökning)
   4. Kör AI-analys (Claude + OpenAI + Gemini)
   5. Spara i DB
   6. Skicka e-postnotis
@@ -19,7 +19,7 @@ import requests
 import yaml
 
 from db import init_db, save_document, save_analysis, get_analyses
-from pdf_extractor import extract_sections
+from pdf_extractor import extract_sections, extract_text_from_pdf
 from scrapers.fi import fetch_new as fi_fetch
 from scrapers.nasdaq_rss import fetch_new as nasdaq_fetch
 from scrapers.avanza import fetch_new as avanza_fetch
@@ -85,7 +85,24 @@ def build_analyzers(config: dict) -> list:
     return analyzers
 
 
-def process_document(doc: dict, conn, analyzers: list, config: dict):
+def build_reader(config: dict):
+    """Skapar läsaren (snabb modell som går igenom hela prospektet), eller None."""
+    reader_cfg = config.get("reader", {})
+    if not reader_cfg.get("enabled"):
+        return None
+    # Samma claude-binär som claude_cli om ingen egen anges
+    cli_cfg = config.get("ai_providers", {}).get("claude_cli", {})
+    if not reader_cfg.get("binary") and cli_cfg.get("binary"):
+        reader_cfg = {**reader_cfg, "binary": cli_cfg["binary"]}
+    from analyzer.reader import ClaudeCliReader
+    try:
+        return ClaudeCliReader(reader_cfg)
+    except RuntimeError as e:
+        log.warning(f"Läsaren avstängd: {e} — använder rubriksökning")
+        return None
+
+
+def process_document(doc: dict, conn, analyzers: list, config: dict, reader=None):
     """Hanterar ett nytt dokument — nedladdning, analys, notis."""
     company = doc["company"]
     log.info(f"Behandlar: {company} ({doc['source']})")
@@ -112,7 +129,13 @@ def process_document(doc: dict, conn, analyzers: list, config: dict):
     # Extrahera nyckelavsnitt
     sections = {}
     if local_path:
-        sections = extract_sections(local_path)
+        full_text = extract_text_from_pdf(local_path)
+        if reader and full_text:
+            sections = reader.read(company, full_text)
+            if not sections:
+                log.warning(f"Läsaren misslyckades för {company} — faller tillbaka på rubriksökning")
+        if not sections:
+            sections = extract_sections(local_path, full_text)
     else:
         log.info(f"Ingen PDF tillgänglig för {company} — analys på metadata")
 
@@ -144,6 +167,7 @@ def run():
     config   = load_config(config_path)
     conn     = init_db(config["storage"]["db_path"])
     analyzers = build_analyzers(config)
+    reader    = build_reader(config)
 
     if not analyzers:
         log.warning("Inga AI-providers aktiverade i config.yaml")
@@ -160,7 +184,7 @@ def run():
 
     for doc in new_docs:
         try:
-            process_document(doc, conn, analyzers, config)
+            process_document(doc, conn, analyzers, config, reader)
         except Exception as e:
             log.error(f"Oväntat fel för {doc.get('company')}: {e}", exc_info=True)
 

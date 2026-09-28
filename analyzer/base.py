@@ -104,6 +104,16 @@ def build_prompt(company: str, sections: dict[str, str]) -> str:
         else:
             sections_text += f"\n### {label}\n[Avsnittet hittades inte i dokumentet]\n"
 
+    # Extra avsnitt som bara läsaren (analyzer/reader.py) plockar ut
+    optional_labels = {
+        "affärsmodell":           "AFFÄRSMODELL",
+        "marknad_och_konkurrens": "MARKNAD OCH KONKURRENS",
+    }
+    for key, label in optional_labels.items():
+        text = sections.get(key, "")
+        if text:
+            sections_text += f"\n### {label}\n{text}\n"
+
     return ANALYSIS_PROMPT_TEMPLATE.format(
         company=company,
         sections_text=sections_text,

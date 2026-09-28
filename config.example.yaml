@@ -18,6 +18,18 @@ email:
   to_addrs:
     - "your.email@gmail.com"
 
+# Läsare: en snabb modell läser HELA prospektet och plockar ut det relevanta
+# innan analysen, i stället för att bara ta första rubrikträffen.
+# Använder Claude Code / prenumerationen (samma som claude_cli).
+# Faller tillbaka på rubriksökning om läsaren misslyckas.
+reader:
+  enabled: true
+  model: "haiku"             # snabb och snål med kvoten
+  chunk_chars: 150000        # tecken per del som läsaren får åt gången
+  max_chunks: 12             # tak för mycket långa prospekt
+  max_chars_per_section: 12000
+  timeout_seconds: 300
+
 # Sätt enabled: false för att stänga av en provider
 ai_providers:
   # Claude via API-nyckel (kostar per anrop)
