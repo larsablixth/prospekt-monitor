@@ -93,7 +93,8 @@ prospekt-monitor/
 │   └── avanza.py           # Avanzas publika erbjudande-API
 ├── analyzer/
 │   ├── base.py             # Gemensamt interface + analyseprompt
-│   ├── claude.py           # Anthropic Claude
+│   ├── claude.py           # Anthropic Claude (API-nyckel)
+│   ├── claude_cli.py       # Claude via `claude -p` (Pro/Max-prenumeration)
 │   ├── openai.py           # OpenAI GPT-4o
 │   └── gemini.py           # Google Gemini
 ├── home_assistant/
@@ -113,8 +114,23 @@ prospekt-monitor/
 
 | Nyckel | Hämtas från |
 |---|---|
-| Anthropic Claude | console.anthropic.com |
+| Anthropic Claude | console.anthropic.com (behövs inte om du kör `claude_cli`) |
 | OpenAI | platform.openai.com |
 | Google Gemini | aistudio.google.com |
 | Gmail App Password | myaccount.google.com → Säkerhet → App-lösenord |
 | HA Long-Lived Token | HA → Profil → Säkerhet → Åtkomsttokens |
+
+## Claude via prenumeration i stället för API
+
+`claude_cli` kör analysen genom Claude Code (`claude -p`) och använder din
+Claude Pro/Max-prenumeration. Ingen API-nyckel behövs.
+
+1. Installera Claude Code som samma användare som tjänsten kör som:
+   `curl -fsSL https://claude.ai/install.sh | bash`
+2. Logga in en gång: `claude` (eller `claude setup-token` på en server utan webbläsare).
+3. Sätt `claude.enabled: false` och `claude_cli.enabled: true` i `config.yaml`.
+4. Se till att `ANTHROPIC_API_KEY` inte är satt för tjänsten
+   (analyzern tar ändå bort den innan anropet).
+
+Om `claude` inte hittas av systemd, ange full sökväg under
+`ai_providers.claude_cli.binary` (se `which claude`).
