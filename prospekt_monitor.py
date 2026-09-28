@@ -70,6 +70,10 @@ def build_analyzers(config: dict) -> list:
         from analyzer.claude import ClaudeAnalyzer
         analyzers.append(ClaudeAnalyzer(providers["claude"]))
 
+    if providers.get("claude_cli", {}).get("enabled"):
+        from analyzer.claude_cli import ClaudeCliAnalyzer
+        analyzers.append(ClaudeCliAnalyzer(providers["claude_cli"]))
+
     if providers.get("openai", {}).get("enabled"):
         from analyzer.openai import OpenAIAnalyzer
         analyzers.append(OpenAIAnalyzer(providers["openai"]))

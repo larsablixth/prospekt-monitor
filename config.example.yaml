@@ -20,10 +20,18 @@ email:
 
 # Sätt enabled: false för att stänga av en provider
 ai_providers:
+  # Claude via API-nyckel (kostar per anrop)
   claude:
-    enabled: true
+    enabled: false
     api_key: "sk-ant-..."
     model: "claude-sonnet-4-6"
+  # Claude via Claude Code CLI — använder Pro/Max-prenumerationen, ingen API-nyckel.
+  # Aktivera bara EN av claude / claude_cli.
+  claude_cli:
+    enabled: true
+    model: "sonnet"          # eller "opus"
+    timeout_seconds: 600
+    # binary: "/home/YOUR_USERNAME/.local/bin/claude"   # om claude inte finns i PATH
   openai:
     enabled: true
     api_key: "sk-proj-..."
